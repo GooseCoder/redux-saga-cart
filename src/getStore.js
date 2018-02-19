@@ -4,6 +4,8 @@ import {
     compose
 } from 'redux';
 
+import createSagaMiddleware from 'redux-saga'
+import { initSagas } from './initSagas'
 import { createLogger } from 'redux-logger';
 import { Iterable } from 'immutable'
 import thunk from 'redux-thunk'
@@ -22,7 +24,8 @@ const logger = createLogger({
 });
 
 export const getStore = ()=>{
-    const middleWares = [thunk];
+    const sagaMiddleware = createSagaMiddleware()
+    const middleWares = [sagaMiddleware, thunk];
     if (getQuery()['logger']) { middleWares.push(logger)}
     const composables = [applyMiddleware(...middleWares)]
     const enhancer = compose(
@@ -33,5 +36,8 @@ export const getStore = ()=>{
         defaultState,
         enhancer
     );
+
+    console.info('Saga middleware implemented')
+    initSagas(sagaMiddleware)
     return store;
 };
